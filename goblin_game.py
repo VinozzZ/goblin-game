@@ -60,9 +60,9 @@ monster_img = pygame.image.load("images/monster.png")
 
 
 def monster_moving():
-    if monster_dict["x"] < 64 or monster_dict["x"] > screen_wh["display_width"] - 64:
+    if monster_dict["x"] < 32 or monster_dict["x"] > screen_wh["display_width"] - 20:
         monster_dict["speed_x"] *= -1
-    if monster_dict["y"] < 64 or monster_dict["y"] > screen_wh["display_height"] - 64:
+    if monster_dict["y"] < 32 or monster_dict["y"] > screen_wh["display_height"] - 20:
         monster_dict["speed_y"] *= -1
 
 
@@ -158,8 +158,7 @@ def game_on():
             hero_dict["Death"] += 1
             background_img = pygame.image.load(random.choice(background_imgs.values()))
     # Monster move
-        if tick % 20 == 0:
-            print ("test")
+        if tick % 60 == 0:
             monster_dict["speed_x"] = random.randrange(-2, 3)
             monster_dict["speed_y"] = random.randrange(-2, 3)
         monster_dict["x"] += monster_dict["speed_x"]
