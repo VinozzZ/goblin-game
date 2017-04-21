@@ -1,8 +1,7 @@
 import pygame
 import time
 from math import fabs
-from random import randint
-from random import choice
+import random
 
 pygame.init()
 
@@ -41,7 +40,9 @@ goblin_dict = {
 }
 monster_dict = {
     "x": 50,
-    "y": 50
+    "y": 50,
+    "speed_x": 4,
+    "speed_y": 4
 }
 hero_width = 10
 screen_size = (screen_wh["display_height"], screen_wh["display_width"])
@@ -58,11 +59,13 @@ goblin_img = pygame.image.load("images/goblin.png")
 monster_img = pygame.image.load("images/monster.png")
 
 
-# def monster_moving():
-#     while monster_dict["x"] > 0 and monster_dict["x"] < screen_wh["display_width"] - 32:
-#         monster_dict["x"] += 5
-#     while monster_dict["y"] > 0 and monster_dict["y"] < screen_wh["display_height"] - 32:
-#         monster_dict["y"] += 5
+def monster_moving():
+    if monster_dict["x"] < 64 or monster_dict["x"] > screen_wh["display_width"] - 64:
+        monster_dict["speed_x"] *= -1
+    if monster_dict["y"] < 64 or monster_dict["y"] > screen_wh["display_height"] - 64:
+        monster_dict["speed_y"] *= -1
+
+
 def game_intro():
 
     intro = True
@@ -94,14 +97,19 @@ def game_intro():
         pygame.display.update()
         clock.tick(15)
 
-
+def music_sound():
+    # Sound
+    background_sound = pygame.mixer.Sound("sounds/music.wav")
+    pygame.mixer.Sound.play(background_sound)
 # ------------MAIN LOOP----------
 
 
 def game_on():
+    tick = 0
     game_on = True
     background_img = pygame.image.load(background_imgs["img1"])
     while game_on:
+        tick += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_on = False
@@ -139,19 +147,24 @@ def game_on():
             hero_dict["y"] = screen_wh["display_height"] - 64
     # collision detection
         if abs(hero_dict["x"] - goblin_dict["x"]) + abs(hero_dict["y"] - goblin_dict["y"]) < 32:
-            goblin_dict["x"] = randint(0, 450)
-            goblin_dict["y"] = randint(0, 482)
+            goblin_dict["x"] = random.randint(0, 450)
+            goblin_dict["y"] = random.randint(0, 482)
             hero_dict["wins"] += 1
 
     # monster eats the hero
         if abs(hero_dict["x"] - monster_dict["x"]) + abs(hero_dict["y"] - monster_dict["y"]) < 32:
-            monster_dict["x"] = randint(0, 450)
-            monster_dict["y"] = randint(0, 482)
             hero_dict["x"] = 0
             hero_dict["y"] = 0
             hero_dict["Death"] += 1
-            background_img = pygame.image.load(choice(background_imgs.values()))
-
+            background_img = pygame.image.load(random.choice(background_imgs.values()))
+    # Monster move
+        if tick % 20 == 0:
+            print ("test")
+            monster_dict["speed_x"] = random.randrange(-2, 3)
+            monster_dict["speed_y"] = random.randrange(-2, 3)
+        monster_dict["x"] += monster_dict["speed_x"]
+        monster_dict["y"] += monster_dict["speed_y"]
+        monster_moving()
         screen.fill(white)
         screen.blit(background_img, [0, 0])
         wins_font = font.render("WINS: %d" % hero_dict["wins"], True, red)
@@ -161,7 +174,8 @@ def game_on():
         screen.blit(hero_img, [hero_dict["x"], hero_dict["y"]])
         screen.blit(goblin_img, [goblin_dict["x"], goblin_dict["y"]])
         screen.blit(monster_img, [monster_dict["x"], monster_dict["y"]])
-        pygame.display.update()
-        clock.tick(60)
+        pygame.display.flip()
 
+
+music_sound()
 game_intro()
